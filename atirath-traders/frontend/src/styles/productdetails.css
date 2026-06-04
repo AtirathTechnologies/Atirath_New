@@ -1,0 +1,551 @@
+/* ===== PRODUCT DETAILS PAGE - MAIN STYLES ===== */
+.product-details-page {
+  background: #f5f7fb;
+  padding: 40px 0;
+}
+
+.container {
+  width: 92%;
+  margin: auto;
+}
+
+.breadcrumb {
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+/* ===== TOP SECTION: IMAGES + BASIC INFO ===== */
+.details-top {
+  display: flex;
+  gap: 25px;
+}
+
+/* LEFT - IMAGES */
+.details-left {
+  width: 50%;
+}
+
+.main-img img {
+  width: 100%;
+  border-radius: 12px;
+  height: 420px;
+  object-fit: cover;
+}
+
+.thumbs {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  overflow-x: auto;
+}
+
+.thumbs img {
+  width: 75px;
+  height: 75px;
+  border-radius: 10px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: 0.3s;
+}
+
+.thumbs img:hover {
+  border-color: #ff6b00;
+}
+
+/* CENTER - PRODUCT INFO */
+.details-center {
+  flex: 1;
+}
+
+.brand-badge {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ff6b00;
+  background: #fff2e6;
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.details-center h2 {
+  color: #0b2c5f;
+  font-size: 34px;
+  margin-bottom: 5px;
+}
+
+.category {
+  color: #777;
+  margin-bottom: 15px;
+}
+
+.price {
+  color: #ff6b00;
+  font-size: 30px;
+  margin-bottom: 20px;
+}
+
+.price span {
+  color: #666;
+  font-size: 18px;
+}
+
+.info-boxes {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.info-boxes div {
+  flex: 1;
+  background: #fff;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid #eee;
+  font-size: 14px;
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+}
+
+.features li {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.btn-group {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+.rfq,
+.cart {
+  padding: 13px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.rfq {
+  background: #ff6b00;
+  color: white;
+  border: none;
+}
+
+.rfq:hover {
+  background: #e85f00;
+}
+
+.cart {
+  border: 1px solid #0b2c5f;
+  background: white;
+  color: #0b2c5f;
+}
+
+.cart:hover {
+  background: #0b2c5f;
+  color: white;
+}
+
+/* ===== 3 CARD LAYOUT (DESCRIPTION, SPECS, SUPPLIER) ===== */
+.product-info-row {
+  display: grid;
+  grid-template-columns: 1.2fr 1.6fr 0.9fr;
+  gap: 25px;
+  margin-top: 50px;
+}
+
+.info-card {
+  background: white;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.info-card h3 {
+  color: #0b2c5f;
+  margin-bottom: 10px;
+}
+
+.underline {
+  width: 40px;
+  height: 3px;
+  background: #ff6b00;
+  margin-bottom: 15px;
+}
+
+/* DESCRIPTION CARD */
+.desc-card p {
+  color: #555;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.desc-card img {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 20px;
+  height: 220px;
+  object-fit: cover;
+}
+
+/* SPECIFICATIONS CARD */
+.spec-list {
+  margin-top: 10px;
+}
+
+.spec-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.spec-row span {
+  color: #555;
+}
+
+.spec-row b {
+  color: #111;
+}
+
+/* SUPPLIER CARD */
+.supplier-card-new {
+  justify-content: space-between;
+}
+
+.supplier-top {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.supplier-top img {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+}
+
+.supplier-top h4 {
+  font-size: 15px;
+  margin-bottom: 3px;
+}
+
+.supplier-top p {
+  font-size: 12px;
+  color: #666;
+}
+
+.supplier-top span {
+  color: #ff9800;
+  font-size: 12px;
+}
+
+.supplier-stats-new {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+}
+
+.supplier-stats-new div {
+  text-align: center;
+}
+
+.supplier-stats-new b {
+  display: block;
+  color: #0b2c5f;
+}
+
+.supplier-stats-new span {
+  font-size: 12px;
+  color: #666;
+}
+
+/* ===== RELATED PRODUCTS SLIDER ===== */
+.related {
+  margin-top: 50px;
+}
+
+.related-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.related-header h3 {
+  font-size: 24px;
+  color: #0b2c5f;
+}
+
+.view-all {
+  color: #0d6efd;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.related-slider {
+  position: relative;
+}
+
+.related-scroll {
+  display: flex;
+  gap: 20px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 10px 45px;
+}
+
+.related-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* SLIDER BUTTONS */
+.slider-btn {
+  position: absolute;
+  top: 42%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  cursor: pointer;
+  z-index: 5;
+  font-size: 20px;
+  transition: 0.3s;
+}
+
+.slider-btn:hover {
+  background: #0b2c5f;
+  color: white;
+}
+
+.slider-btn.left {
+  left: -10px;
+}
+
+.slider-btn.right {
+  right: -10px;
+}
+
+/* RELATED PRODUCT CARD */
+.related-card {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  background: white;
+  border-radius: 14px;
+  border: 1px solid #e8e8e8;
+  padding: 12px;
+  flex-shrink: 0;
+  transition: 0.3s;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.related-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+/* IMAGE BOX */
+.img-box {
+  position: relative;
+  width: 100%;
+}
+
+.img-box img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* HEART ICON */
+.heart {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  background: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+}
+
+/* CARD TEXT */
+.related-card h4 {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #0b2c5f;
+  line-height: 1.4;
+  min-height: 42px;
+}
+
+.card-price {
+  margin-top: 8px;
+  color: #ff6b00;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.card-price span {
+  font-size: 14px;
+  color: #777;
+  font-weight: 400;
+}
+
+.moq {
+  color: #777;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+/* ===== LEGACY LAYOUT (if needed - kept for compatibility) ===== */
+.spec-supplier-row {
+  display: flex;
+  gap: 25px;
+  margin-top: 40px;
+  align-items: stretch;
+}
+
+.specs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.specs h3 {
+  margin-bottom: 15px;
+  color: #0b2c5f;
+}
+
+.specs table {
+  width: 52%;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  border-collapse: collapse;
+  height: 100%;
+}
+
+.specs td {
+  padding: 11px 40px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+}
+
+.specs tr td:first-child {
+  font-weight: 600;
+  width: 35%;
+  background: #fafafa;
+}
+
+.supplier-card {
+  width: 280px;
+  background: white;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: auto;
+  margin-top: 38px;
+}
+
+.supplier-card h4 {
+  margin-bottom: 14px;
+  color: #0b2c5f;
+  font-size: 20px;
+}
+
+.supplier-info {
+  display: flex;
+  gap: 10px;
+}
+
+.supplier-info img {
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+}
+
+.supplier-info h5 {
+  margin-bottom: 3px;
+  font-size: 15px;
+}
+
+.supplier-info p {
+  font-size: 12px;
+  color: #666;
+  margin: 2px 0;
+}
+
+.supplier-info span {
+  color: #ff9800;
+  font-size: 12px;
+}
+
+.supplier-stats {
+  display: flex;
+  justify-content: space-between;
+  margin: 18px 0 10px;
+}
+
+.supplier-stats div {
+  text-align: center;
+}
+
+.supplier-stats b {
+  display: block;
+  color: #0b2c5f;
+  margin-bottom: 3px;
+  font-size: 15px;
+}
+
+.supplier-stats span {
+  font-size: 11px;
+  color: #666;
+}
+
+.profile,
+.contact {
+  width: 100%;
+  padding: 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+.profile {
+  background: #0b2c5f;
+  color: white;
+  border: none;
+}
+
+.contact {
+  border: 1px solid #0b2c5f;
+  background: white;
+  color: #0b2c5f;
+}
