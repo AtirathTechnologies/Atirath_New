@@ -218,11 +218,11 @@ const Header = () => {
   }));
 
   const servicesDropdown = [
-    { name: 'Import Services', path: '/services?type=Import%20Services' },
-    { name: 'Export Services', path: '/services?type=Export%20Services' },
-    { name: 'Global Sourcing', path: '/services?type=Global%20Sourcing' },
-    { name: 'Logistics Support', path: '/services?type=Logistics%20Support' },
-    { name: 'Custom Solutions', path: '/services?type=Custom%20Solutions' },
+    { name: 'Import Services', path: '/services/import' },
+    { name: 'Export Services', path: '/services/export' },
+    { name: 'Global Sourcing', path: '/services/global-sourcing' },
+    { name: 'Logistics Support', path: '/services/logistics-support' },
+    { name: 'Custom Solutions', path: '/services/custom-solutions' },
   ];
 
   return (

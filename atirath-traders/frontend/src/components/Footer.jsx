@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
 const Footer = () => {
   return (
@@ -26,12 +27,11 @@ const Footer = () => {
           <div className="footer-links">
             <h4>Quick Links</h4>
             <ul>
-              <li>Home</li>
-              <li>About Us</li>
-              <li>Products</li>
-              <li>Services</li>
-              <li>Industries</li>
-              <li>Contact Us</li>
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/about">About Us</Link></li>
+              <li><Link to="/products">Products</Link></li>
+              <li><Link to="/services/import">Services</Link></li>
+              <li><Link to="/contact">Contact Us</Link></li>
             </ul>
           </div>
 
@@ -40,11 +40,11 @@ const Footer = () => {
             <h4>Products</h4>
             <ul>
               <li>Agriculture Products</li>
-              <li>Textiles & Fabrics</li>
-              <li>Machinery & Equipment</li>
-              <li>Electronics & Accessories</li>
-              <li>Home & Lifestyle Products</li>
-              <li>Chemicals & Minerals</li>
+              <li>Textiles &amp; Fabrics</li>
+              <li>Machinery &amp; Equipment</li>
+              <li>Electronics &amp; Accessories</li>
+              <li>Home &amp; Lifestyle Products</li>
+              <li>Chemicals &amp; Minerals</li>
             </ul>
           </div>
 
@@ -52,11 +52,11 @@ const Footer = () => {
           <div className="footer-links">
             <h4>Support</h4>
             <ul>
-              <li>Help Center</li>
-              <li>Terms & Conditions</li>
-              <li>Privacy Policy</li>
-              <li>Shipping Policy</li>
-              <li>FAQ</li>
+              <li><Link to="/support/help-center">Help Center</Link></li>
+              <li><Link to="/support/terms">Terms &amp; Conditions</Link></li>
+              <li><Link to="/support/privacy-policy">Privacy Policy</Link></li>
+              <li><Link to="/support/shipping-policy">Shipping Policy</Link></li>
+              <li><Link to="/support/faq">FAQ</Link></li>
             </ul>
           </div>
 
@@ -78,7 +78,7 @@ const Footer = () => {
             © 2024 Atirath Traders. All Rights Reserved.
           </div>
           <div className="policy-links">
-            <a href="#">Privacy Policy</a> | <a href="#">Terms & Conditions</a>
+            <Link to="/support/privacy-policy">Privacy Policy</Link> | <Link to="/support/terms">Terms &amp; Conditions</Link>
           </div>
         </div>
       </div>

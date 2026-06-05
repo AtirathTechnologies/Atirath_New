@@ -4,8 +4,8 @@ import SEO from '../components/SEO';
 const ContactPage = () => {
   return (
     <>
-      <SEO 
-        title="Contact Us" 
+      <SEO
+        title="Contact Us"
         description="Get in touch with Atirath Traders for all your global import and export needs. Send us an inquiry for agriculture, textiles, or machinery trade."
         keywords="contact atirath traders, import export inquiry, global trade contact, business partnership india"
       />
@@ -32,9 +32,9 @@ const ContactPage = () => {
           </div>
           <div className="card">
             <h3>Contact Information</h3>
-            <div className="info-item"><div className="info-icon whatsapp"><i className="fa-brands fa-whatsapp"></i></div><div><h4>WhatsApp</h4><p><strong>+91 98765 43210</strong></p><small>Chat with us on WhatsApp</small></div></div>
+            <div className="info-item"><div className="info-icon whatsapp"><i className="fa-brands fa-whatsapp"></i></div><div><h4>WhatsApp</h4><p><strong>+91 95537 74933</strong></p><small>Chat with us on WhatsApp</small></div></div>
             <div className="info-item"><div className="info-icon email"><i className="fa-regular fa-envelope"></i></div><div><h4>Email</h4><p><strong>info@atirathtraders.com</strong></p><small>Drop us an email anytime</small></div></div>
-            <div className="info-item"><div className="info-icon phone"><i className="fa-solid fa-phone"></i></div><div><h4>Phone</h4><p><strong>+91 98765 43210</strong></p><small>Mon - Sat: 9:00 AM - 6:00 PM</small></div></div>
+            <div className="info-item"><div className="info-icon phone"><i className="fa-solid fa-phone"></i></div><div><h4>Phone</h4><p><strong>+91 95537 74933</strong></p><small>Mon - Sat: 9:00 AM - 6:00 PM</small></div></div>
             <div className="info-item"><div className="info-icon location"><i className="fa-solid fa-location-dot"></i></div><div><h4>Office Address</h4><p><strong>Atirath Traders Pvt. Ltd.</strong><br />123, Business Park, HITEC City,<br />Hyderabad, Telangana - 500081, India</p></div></div>
             <div className="social"><h4>Follow Us</h4><div className="social-icons"><a href="#"><i className="fab fa-facebook-f"></i></a><a href="#"><i className="fab fa-linkedin-in"></i></a><a href="#"><i className="fab fa-instagram"></i></a><a href="#"><i className="fab fa-whatsapp"></i></a></div></div>
           </div>

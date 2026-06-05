@@ -1847,6 +1847,17 @@ textarea {
   transform: translateX(3px);
 }
 
+.footer-links li a {
+  color: inherit;
+  text-decoration: none;
+  display: block;
+  transition: 0.2s;
+}
+
+.footer-links li a:hover {
+  color: var(--accent-orange);
+}
+
 .footer-contact li i {
   width: 25px;
   color: var(--accent-orange);
