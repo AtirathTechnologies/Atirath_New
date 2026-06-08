@@ -15,9 +15,29 @@ const BrandsPage = () => {
   const [openCategoriesMenu, setOpenCategoriesMenu] = useState(true);
   const [showAllBrands, setShowAllBrands] = useState(false); // toggle for sidebar brands
 
+  // Filter states (price, origin, MOQ)
+  const [maxPriceFilter, setMaxPriceFilter] = useState(100);
+  const [sliderMax, setSliderMax] = useState(100);
+  const [selectedOrigins, setSelectedOrigins] = useState([]);
+  const [moqInput, setMoqInput] = useState("");
+  const [appliedMoq, setAppliedMoq] = useState(null);
+
+  // Helper to parse price string
+  const parseProductPrice = (priceStr) => {
+    if (!priceStr || priceStr.toLowerCase().includes("request")) return 0;
+    const firstPart = priceStr.split(/[–-]/)[0];
+    return parseFloat(firstPart.replace(/[^0-9.]/g, '')) || 0;
+  };
+
   // Read brand from URL
   useEffect(() => {
     const brandParam = searchParams.get("brand");
+    
+    // Reset other filters on brand change
+    setSelectedOrigins([]);
+    setMoqInput("");
+    setAppliedMoq(null);
+
     if (brandParam && brands.includes(brandParam)) {
       setSelectedBrand(brandParam);
       setSelectedSubcategory("All");
@@ -33,12 +53,57 @@ const BrandsPage = () => {
     return ["All", ...uniqueSubcats.sort()];
   };
 
-  const getFilteredProducts = () => {
-    if (!selectedBrand) return [];
-    let filtered = products.filter(p => p.brand === selectedBrand);
-    if (selectedSubcategory && selectedSubcategory !== "All") {
-      filtered = filtered.filter(p => p.subcategory === selectedSubcategory);
+  const getBaseFilteredProducts = () => {
+    let filtered = products;
+    if (selectedBrand) {
+      filtered = filtered.filter(p => p.brand === selectedBrand);
+      if (selectedSubcategory && selectedSubcategory !== "All") {
+        filtered = filtered.filter(p => p.subcategory === selectedSubcategory);
+      }
     }
+    return filtered;
+  };
+
+  // Calibrate price slider range based on loaded products and currency
+  useEffect(() => {
+    if (products && products.length) {
+      const baseProducts = getBaseFilteredProducts();
+      const prices = baseProducts.map(p => parseProductPrice(p.priceDisplay)).filter(p => p > 0);
+      if (prices.length) {
+        const maxVal = Math.ceil(Math.max(...prices));
+        setSliderMax(maxVal);
+        setMaxPriceFilter(maxVal);
+      } else {
+        setSliderMax(100);
+        setMaxPriceFilter(100);
+      }
+    }
+  }, [selectedBrand, selectedSubcategory, products]);
+
+  const getFilteredProducts = () => {
+    let filtered = getBaseFilteredProducts();
+
+    // Price range filter
+    filtered = filtered.filter(p => {
+      if (!p.priceDisplay || p.priceDisplay.toLowerCase().includes("request")) return true;
+      const priceVal = parseProductPrice(p.priceDisplay);
+      return priceVal <= maxPriceFilter;
+    });
+
+    // Country of Origin filter
+    if (selectedOrigins.length > 0) {
+      filtered = filtered.filter(p => selectedOrigins.includes(p.origin));
+    }
+
+    // MOQ filter
+    if (appliedMoq !== null) {
+      filtered = filtered.filter(p => {
+        if (!p.moq || String(p.moq).toLowerCase().includes("n/a")) return true;
+        const moqVal = parseFloat(String(p.moq).replace(/[^0-9.]/g, '')) || 0;
+        return moqVal <= appliedMoq;
+      });
+    }
+
     return filtered;
   };
 
@@ -48,19 +113,53 @@ const BrandsPage = () => {
   const handleBrandClick = (brandName) => {
     setSelectedBrand(brandName);
     setSelectedSubcategory("All");
+    setSelectedOrigins([]);
+    setMoqInput("");
+    setAppliedMoq(null);
     setSearchParams({ brand: brandName });
   };
 
   const clearBrandFilter = () => {
     setSelectedBrand(null);
     setSelectedSubcategory("All");
+    setSelectedOrigins([]);
+    setMoqInput("");
+    setAppliedMoq(null);
     setSearchParams({});
   };
 
   const handleSubcategoryClick = (subcat) => {
     setSelectedSubcategory(subcat);
+    setSelectedOrigins([]);
+    setMoqInput("");
+    setAppliedMoq(null);
     if (selectedBrand) {
       setSearchParams({ brand: selectedBrand });
+    }
+  };
+
+  const handleClearAll = () => {
+    setSelectedOrigins([]);
+    setMoqInput("");
+    setAppliedMoq(null);
+    if (products && products.length) {
+      const baseProducts = getBaseFilteredProducts();
+      const prices = baseProducts.map(p => parseProductPrice(p.priceDisplay)).filter(p => p > 0);
+      if (prices.length) {
+        const maxVal = Math.ceil(Math.max(...prices));
+        setMaxPriceFilter(maxVal);
+      } else {
+        setMaxPriceFilter(100);
+      }
+    }
+  };
+
+  const handleApplyMoq = () => {
+    const val = parseFloat(moqInput);
+    if (!isNaN(val)) {
+      setAppliedMoq(val);
+    } else {
+      setAppliedMoq(null);
     }
   };
 
@@ -71,6 +170,22 @@ const BrandsPage = () => {
 
   // Determine which brands to show in sidebar
   const displayedBrands = showAllBrands ? brands : brands.slice(0, 6);
+
+  const baseProducts = getBaseFilteredProducts();
+
+  // Dynamic values based on current filtered products
+  const hasRupee = baseProducts.some(p => p.priceDisplay && p.priceDisplay.includes("₹"));
+  const currencySymbol = hasRupee ? "₹" : "$";
+
+  // Calculate country of origin options dynamically
+  const originCounts = {};
+  baseProducts.forEach(p => {
+    if (p.origin) {
+      originCounts[p.origin] = (originCounts[p.origin] || 0) + 1;
+    }
+  });
+
+  const availableOrigins = Object.keys(originCounts).sort();
 
   if (loading) {
     return (
@@ -114,7 +229,7 @@ const BrandsPage = () => {
                 ? selectedSubcategory === "All"
                   ? `Showing all products from ${selectedBrand}`
                   : `Showing ${selectedSubcategory} from ${selectedBrand}`
-                : "Select a brand from the sidebar to view products"}
+                : "Showing products from all partnered brands. Select a brand to filter."}
             </p>
           </div>
           <div className="header-right">
@@ -225,51 +340,89 @@ const BrandsPage = () => {
               </div>
             )}
 
-            {/* STATIC FILTERS (unchanged) */}
+            {/* DYNAMIC FILTERS */}
             <div className="filter-header top">
               <h4>Filter By</h4>
-              <span className="clear">Clear All</span>
+              <span className="clear" onClick={handleClearAll} style={{ cursor: "pointer" }}>Clear All</span>
             </div>
+            
+            {/* Price Range */}
             <div className="filter-section">
               <p className="filter-title">Price Range</p>
-              <div className="range-values"><span>$10</span><span>$5000+</span></div>
-              <input type="range" className="range" />
+              <div className="range-values">
+                <span>{currencySymbol}1</span>
+                <span>{currencySymbol}{maxPriceFilter.toLocaleString()}+</span>
+              </div>
+              <input 
+                type="range" 
+                className="range" 
+                min="1"
+                max={sliderMax}
+                value={maxPriceFilter}
+                onChange={(e) => setMaxPriceFilter(parseFloat(e.target.value))}
+              />
             </div>
+
+            {/* Minimum Order Quantity (MOQ) */}
             <div className="filter-section">
               <p className="filter-title">Minimum Order Quantity (MOQ)</p>
-              <div className="moq-box"><input type="text" placeholder="Enter MOQ" /><button>OK</button></div>
+              <div className="moq-box">
+                <input 
+                  type="number" 
+                  placeholder="Enter MOQ" 
+                  value={moqInput}
+                  onChange={(e) => setMoqInput(e.target.value)}
+                />
+                <button onClick={handleApplyMoq}>OK</button>
+              </div>
+              {appliedMoq !== null && (
+                <div className="active-filter-badge" style={{ marginTop: "8px", fontSize: "0.8rem", color: "#ff6b00" }}>
+                  Active MOQ: ≤ {appliedMoq}
+                </div>
+              )}
             </div>
+
+            {/* Country of Origin */}
             <div className="filter-section">
               <p className="filter-title">Country of Origin</p>
-              <label><input type="checkbox" /> India <span>(245)</span></label>
-              <label><input type="checkbox" /> China <span>(208)</span></label>
-              <label><input type="checkbox" /> USA <span>(128)</span></label>
-              <label><input type="checkbox" /> Germany <span>(95)</span></label>
-              <label><input type="checkbox" /> Turkey <span>(75)</span></label>
-              <p className="view-more">+ View More</p>
+              {availableOrigins.length === 0 ? (
+                <p style={{ fontSize: "0.85rem", color: "#666" }}>No origins available</p>
+              ) : (
+                availableOrigins.map(origin => (
+                  <label key={origin} style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", margin: "6px 0" }}>
+                    <input 
+                      type="checkbox" 
+                      checked={selectedOrigins.includes(origin)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedOrigins([...selectedOrigins, origin]);
+                        } else {
+                          setSelectedOrigins(selectedOrigins.filter(o => o !== origin));
+                        }
+                      }}
+                    /> 
+                    {origin} <span>({originCounts[origin]})</span>
+                  </label>
+                ))
+              )}
             </div>
+
+            {/* Supplier Type (Static) */}
             <div className="filter-section">
               <p className="filter-title">Supplier Type</p>
               <label><input type="checkbox" />Verified Suppliers</label>
               <label><input type="checkbox" />Gold Suppliers 👑</label>
             </div>
+            
             <div className="filter-buttons">
-              <button className="apply">Apply Filters</button>
-              <button className="reset">Reset</button>
+              <button className="reset" onClick={handleClearAll} style={{ width: "100%" }}>Reset Filters</button>
             </div>
           </div>
 
-          {/* PRODUCTS DISPLAY */}
           <div className="products">
-            {!selectedBrand ? (
-              <div style={{ textAlign: "center", padding: "60px 20px", background: "#fff", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
-                <i className="fas fa-trademark" style={{ fontSize: "48px", color: "#ff6b00", marginBottom: "20px" }}></i>
-                <h3 style={{ color: "#0b2c5f", marginBottom: "10px" }}>Select a Brand to View Products</h3>
-                <p style={{ color: "#6b7280" }}>Click on any brand logo from the sidebar.</p>
-              </div>
-            ) : displayProducts.length === 0 ? (
+            {displayProducts.length === 0 ? (
               <div style={{ textAlign: "center", padding: "50px", color: "#666", fontSize: "1.1rem", background: "#fff", borderRadius: "12px" }}>
-                😔 No products found for {selectedBrand} in {selectedSubcategory !== "All" ? selectedSubcategory : "this category"}.
+                😔 No products found {selectedBrand ? `for ${selectedBrand}` : ""} in {selectedSubcategory !== "All" ? selectedSubcategory : "this category"}.
               </div>
             ) : (
               <div className="product-grid">
@@ -292,10 +445,13 @@ const BrandsPage = () => {
                           <span className="meta-icon">⚖️</span> quantity: {p.quantityDisplay}
                         </div>
                         <div className="meta-item">
+                          <span className="meta-icon">📦</span> MOQ: {p.moq}
+                        </div>
+                        <div className="meta-item">
                           <span className="meta-icon">📍</span> Origin: {p.origin}
                         </div>
                         <div className="meta-item">
-                          <span className="meta-icon">📦</span> Pack Type: {p.packTypes}
+                          <span className="meta-icon">🗂️</span> Pack Type: {p.packTypes}
                         </div>
                       </div>
                       <div className="card-actions">

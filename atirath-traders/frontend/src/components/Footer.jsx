@@ -16,10 +16,10 @@ const Footer = () => {
               quality products and reliable services worldwide.
             </p>
             <div className="social-icons">
-              <a href="#" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
-              <a href="#" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
-              <a href="#" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
-              <a href="#" aria-label="WhatsApp"><i className="fab fa-whatsapp"></i></a>
+              <a href="https://www.facebook.com/share/1GE7seKPgf/" aria-label="Facebook"><i className="fab fa-facebook-f"></i></a>
+              <a href="https://www.linkedin.com/company/atirath-traders-india-private/" aria-label="LinkedIn"><i className="fab fa-linkedin-in"></i></a>
+              <a href="https://www.instagram.com/atirathtradersindia?igsh=c2JvbjB3YzJsMjZu" aria-label="Instagram"><i className="fab fa-instagram"></i></a>
+              <a href="https://wa.me/919553774933" aria-label="WhatsApp"><i className="fab fa-whatsapp"></i></a>
             </div>
           </div>
 
@@ -30,7 +30,7 @@ const Footer = () => {
               <li><Link to="/">Home</Link></li>
               <li><Link to="/about">About Us</Link></li>
               <li><Link to="/products">Products</Link></li>
-              <li><Link to="/services/import">Services</Link></li>
+              <li><Link to="/services">Services</Link></li>
               <li><Link to="/contact">Contact Us</Link></li>
             </ul>
           </div>
@@ -64,7 +64,7 @@ const Footer = () => {
           <div className="footer-contact">
             <h4>Contact Us</h4>
             <ul>
-              <li><i className="fas fa-phone-alt"></i> +91 98765 43210</li>
+              <li><i className="fas fa-phone-alt"></i> +91 95537 74933</li>
               <li><i className="fas fa-envelope"></i> info@atirathtraders.com</li>
               <li><i className="fas fa-map-marker-alt"></i> Hyderabad, India</li>
               <li><i className="fas fa-globe"></i> Global Presence</li>
@@ -75,7 +75,7 @@ const Footer = () => {
         {/* Bottom Bar - Copyright & Policy Links */}
         <div className="footer-bottom">
           <div className="copyright">
-            © 2024 Atirath Traders. All Rights Reserved.
+            © 2025 Atirath Traders. All Rights Reserved.
           </div>
           <div className="policy-links">
             <Link to="/support/privacy-policy">Privacy Policy</Link> | <Link to="/support/terms">Terms &amp; Conditions</Link>

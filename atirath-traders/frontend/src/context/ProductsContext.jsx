@@ -72,6 +72,7 @@ const transformProduct = (raw, id) => {
   const img = getImagePath(raw.image);
   const moq = raw.productDetails?.moq || "N/A";
   const pricePerMT = raw.productDetails?.pricePerMT || "N/A";
+  const supplyAbility = raw.productDetails?.supplyAbility || "N/A";
 
   return {
     id,
@@ -90,6 +91,7 @@ const transformProduct = (raw, id) => {
     img,
     moq,
     pricePerMT,
+    supplyAbility,
   };
 };
 

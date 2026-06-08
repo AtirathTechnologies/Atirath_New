@@ -14,6 +14,16 @@ const getImagePath = (rawPath) => {
   return `/${rawPath}`;
 };
 
+// Helper: Parse MOQ to get value and unit
+const parseMoq = (moqString) => {
+  if (!moqString || moqString.toLowerCase() === "n/a") return { value: 1, unit: "units" };
+  const match = moqString.match(/^([\d.]+)\s*(.*)$/);
+  if (match) {
+    return { value: parseFloat(match[1]), unit: match[2].trim() || "units" };
+  }
+  return { value: 1, unit: "units" };
+};
+
 // Transform raw Firebase product to UI-friendly format
 const transformProduct = (raw, id) => {
   const name = raw.name || "Unnamed Product";
@@ -56,6 +66,38 @@ const transformProduct = (raw, id) => {
   const supplyAbility = raw.productDetails?.supplyAbility || "N/A";
   const leadTime = raw.productDetails?.leadTime || "N/A";
   const features = raw.productDetails?.features || [];
+
+  // Price display (same logic as ProductsContext)
+  let priceDisplay = "";
+  let quantityDisplay = "";
+  if (raw.meta?.price_range) {
+    const currency = raw.pricing?.currency || "INR";
+    const symbol = currency === "USD" ? "$" : "₹";
+    priceDisplay = `${symbol}${raw.meta.price_range.min.toLocaleString()} \u2013 ${symbol}${raw.meta.price_range.max.toLocaleString()}`;
+    const quantityUnits = raw.configurations?.quantityUnits;
+    if (quantityUnits && Array.isArray(quantityUnits) && quantityUnits.length) {
+      quantityDisplay = quantityUnits.length === 1
+        ? quantityUnits[0]
+        : `${quantityUnits[0]} \u2013 ${quantityUnits[quantityUnits.length - 1]}`;
+    } else {
+      quantityDisplay = "N/A";
+    }
+  } else if (raw.pricing?.type === "fixed") {
+    const currency = raw.pricing.currency || "USD";
+    const symbol = currency === "USD" ? "$" : "₹";
+    priceDisplay = `${symbol}${raw.pricing.basePrice || 0} ${currency === "USD" ? "FOB" : ""}`.trim();
+    const pkg = raw.packagingDetails;
+    if (pkg && pkg.unit_weight && pkg.unit && pkg.units_per_carton) {
+      quantityDisplay = `${pkg.unit_weight}${pkg.unit} \u00d7 ${pkg.units_per_carton} carton`;
+    } else if (raw.configurations?.quantityUnits?.length) {
+      quantityDisplay = raw.configurations.quantityUnits[0];
+    } else {
+      quantityDisplay = "N/A";
+    }
+  } else {
+    priceDisplay = "Price on request";
+    quantityDisplay = "N/A";
+  }
 
   let specs = [];
   if (raw.specifications && typeof raw.specifications === "object") {
@@ -109,6 +151,8 @@ const transformProduct = (raw, id) => {
     packTypes,
     mainImage,
     gallery,
+    priceDisplay,
+    quantityDisplay,
     pricePerMT,
     moq,
     supplyAbility,
@@ -118,6 +162,8 @@ const transformProduct = (raw, id) => {
     supplier
   };
 };
+
+const RICE_SUBCATEGORIES = ["Basmati Rice", "Non-Basmati Rice", "Rice", "Basmati", "Non-Basmati"];
 
 const ProductDetails = () => {
   const location = useLocation();
@@ -130,6 +176,14 @@ const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // RFQ Modal state
+  const [rfqOpen, setRfqOpen] = useState(false);
+  const [rfqForm, setRfqForm] = useState({
+    name: "", pincode: "", address: "", quantity: "", unit: ""
+  });
+  const [rfqSubmitted, setRfqSubmitted] = useState(false);
+  const [rfqError, setRfqError] = useState("");
 
   const scrollRef = useRef(null);
 
@@ -177,7 +231,7 @@ const ProductDetails = () => {
             p.category === currentProduct.category &&
             p.subcategory === currentProduct.subcategory
           );
-        } 
+        }
         else if (currentProduct.category === "Food & Beverages") {
           // Food & Beverages: same subcategory (Snacks, Chocolate)
           related = allProductsArray.filter(p =>
@@ -279,12 +333,12 @@ const ProductDetails = () => {
 
   const mainImage = product.mainImage || "/placeholder.jpg";
   const galleryImages = product.gallery && product.gallery.length > 0 ? product.gallery : [mainImage];
-  const breadcrumb = `Home › Products › ${product.categoryTitle || product.subcategory || "Product"} › ${product.name}`;
+  const breadcrumb = `Home › Products › ${product.subcategory || product.categoryTitle || "Product"} › ${product.name}`;
 
   return (
     <div className="product-details-page">
-      <SEO 
-        title={product.name} 
+      <SEO
+        title={product.name}
         description={`Buy ${product.name} from ${product.brand}. High-quality ${product.categoryTitle} sourced from ${product.origin}. Check price per MT, MOQ, and specifications.`}
         keywords={`${product.name}, ${product.brand}, ${product.categoryTitle}, atirath traders, import ${product.name}, export ${product.name}`}
       />
@@ -295,17 +349,17 @@ const ProductDetails = () => {
         <div className="details-top">
           <div className="details-left">
             <div className="main-img">
-              <img 
-                src={mainImage} 
+              <img
+                src={mainImage}
                 alt={product.name}
                 onError={(e) => { e.target.src = "/placeholder.jpg"; }}
               />
             </div>
             <div className="thumbs">
               {galleryImages.slice(0, 6).map((img, idx) => (
-                <img 
-                  key={idx} 
-                  src={img} 
+                <img
+                  key={idx}
+                  src={img}
                   alt={`${product.name} ${idx + 1}`}
                   onError={(e) => { e.target.src = "/placeholder.jpg"; }}
                 />
@@ -316,15 +370,15 @@ const ProductDetails = () => {
           <div className="details-center">
             <span className="brand-badge">{product.brand}</span>
             <h2>{product.name}</h2>
-            <p className="category">{product.categoryTitle || product.subcategory || "Product"}</p>
+            <p className="category">{product.subcategory || product.categoryTitle || "Product"}</p>
 
             <h3 className="price">
-              {product.pricePerMT} <span>/ Metric Ton (MT)</span>
+              {product.priceDisplay}
             </h3>
 
             <div className="info-boxes">
               <div><b>MOQ</b><br />{product.moq}</div>
-              <div><b>Supply Ability</b><br />{product.supplyAbility}</div>
+              <div><b>Quantity</b><br />{product.quantityDisplay}</div>
               <div><b>Lead Time</b><br />{product.leadTime}</div>
             </div>
 
@@ -337,8 +391,13 @@ const ProductDetails = () => {
             </ul>
 
             <div className="btn-group">
-              <button className="rfq">Request for Quote (RFQ)</button>
-              <button className="cart">Add to Cart</button>
+              <button className="rfq" style={{ width: '100%' }} onClick={() => { 
+                setRfqOpen(true); 
+                setRfqSubmitted(false); 
+                setRfqError("");
+                const parsedMoq = parseMoq(product.moq);
+                setRfqForm({ name: "", pincode: "", address: "", quantity: "", unit: parsedMoq.unit }); 
+              }}>Request for Quote (RFQ)</button>
             </div>
           </div>
         </div>
@@ -377,8 +436,8 @@ const ProductDetails = () => {
               <h3>Supplier Details</h3>
               <div className="underline"></div>
               <div className="supplier-top">
-                <img 
-                  src={product.supplier.image} 
+                <img
+                  src={product.supplier.image}
                   alt="supplier"
                   onError={(e) => { e.target.src = "https://randomuser.me/api/portraits/men/default.jpg"; }}
                 />
@@ -417,15 +476,15 @@ const ProductDetails = () => {
                   style={{ cursor: "pointer" }}
                 >
                   <div className="img-box">
-                    <img 
-                      src={relProd.mainImage || "/placeholder.jpg"} 
+                    <img
+                      src={relProd.mainImage || "/placeholder.jpg"}
                       alt={relProd.name}
                       onError={(e) => { e.target.src = "/placeholder.jpg"; }}
                     />
                   </div>
                   <h4>{relProd.name}</h4>
-                  <p className="card-price">{relProd.pricePerMT} <span>/ MT</span></p>
-                  <p className="moq">{relProd.moq}</p>
+                  <p className="card-price">{relProd.priceDisplay}</p>
+                  <p className="moq">{relProd.quantityDisplay}</p>
                 </div>
               ))}
               {relatedProducts.length === 0 && (
@@ -436,6 +495,116 @@ const ProductDetails = () => {
         </div>
 
       </div>
+
+      {/* ===== RFQ MODAL ===== */}
+      {rfqOpen && (() => {
+        const parsedMoq = parseMoq(product.moq);
+        const minQty = parsedMoq.value;
+        const moqUnit = parsedMoq.unit;
+
+        const handleChange = (e) => {
+          setRfqError("");
+          setRfqForm(f => ({ ...f, [e.target.name]: e.target.value }));
+        };
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          const enteredQty = parseFloat(rfqForm.quantity);
+          if (isNaN(enteredQty) || enteredQty < minQty) {
+            setRfqError(`Minimum required quantity is ${minQty} ${moqUnit}.`);
+            return;
+          }
+          const unit = rfqForm.unit ? ` ${rfqForm.unit}` : "";
+          const msg =
+            `*🛒 New RFQ Inquiry – Atirath Traders*\n\n` +
+            `*📦 Product Details*\n` +
+            `• Product : ${product.name}\n` +
+            `• Brand   : ${product.brand}\n` +
+            `• Category: ${product.subcategory || product.categoryTitle || "N/A"}\n` +
+            `• Price   : ${product.priceDisplay}\n` +
+            `• MOQ     : ${product.moq}\n` +
+            `• Quantity: ${product.quantityDisplay}\n` +
+            `• Origin  : ${product.origin}\n\n` +
+            `*👤 Customer Details*\n` +
+            `• Name    : ${rfqForm.name}\n` +
+            `• Pincode : ${rfqForm.pincode}\n` +
+            `• Address : ${rfqForm.address}\n` +
+            `• Quantity: ${rfqForm.quantity}${unit}\n\n` +
+            `_Sent via atirathtraders.com_`;
+          const waUrl = `https://wa.me/919703744571?text=${encodeURIComponent(msg)}`;
+          window.open(waUrl, "_blank", "noopener,noreferrer");
+          setRfqSubmitted(true);
+        };
+        return (
+          <div className="rfq-overlay" onClick={(e) => { if (e.target.classList.contains('rfq-overlay')) setRfqOpen(false); }}>
+            <div className="rfq-modal">
+              {/* LEFT – sticky product info */}
+              <div className="rfq-left">
+                <img
+                  src={product.mainImage || "/placeholder.jpg"}
+                  alt={product.name}
+                  className="rfq-product-img"
+                  onError={(e) => { e.target.src = "/placeholder.jpg"; }}
+                />
+                <div className="rfq-product-info">
+                  <span className="rfq-brand-badge">{product.brand}</span>
+                  <h3 className="rfq-product-name">{product.name}</h3>
+                  <p className="rfq-subcat">{product.subcategory || product.categoryTitle}</p>
+                  <div className="rfq-meta-row"><span>💰 Price</span><b>{product.priceDisplay}</b></div>
+                  <div className="rfq-meta-row"><span>📦 MOQ</span><b>{product.moq}</b></div>
+                  <div className="rfq-meta-row"><span>⚖️ Quantity</span><b>{product.quantityDisplay}</b></div>
+                  <div className="rfq-meta-row"><span>⏱ Lead Time</span><b>{product.leadTime}</b></div>
+                  <div className="rfq-meta-row"><span>🌍 Origin</span><b>{product.origin}</b></div>
+                </div>
+              </div>
+
+              {/* RIGHT – scrollable form */}
+              <div className="rfq-right">
+                <button className="rfq-close" onClick={() => setRfqOpen(false)}>✕</button>
+                <h2 className="rfq-title">Request for Quote</h2>
+                <p className="rfq-subtitle">Fill in your details and we'll get back to you shortly.</p>
+
+                {rfqSubmitted ? (
+                  <div className="rfq-success">
+                    <div className="rfq-success-icon">✔</div>
+                    <h3>Inquiry Submitted!</h3>
+                    <p>Thank you <b>{rfqForm.name}</b>! Our team will contact you soon regarding <b>{product.name}</b>.</p>
+                    <button className="rfq-done-btn" onClick={() => setRfqOpen(false)}>Close</button>
+                  </div>
+                ) : (
+                  <form className="rfq-form" onSubmit={handleSubmit}>
+                    <div className="rfq-field">
+                      <label>Full Name <span>*</span></label>
+                      <input name="name" type="text" placeholder="Enter your full name" value={rfqForm.name} onChange={handleChange} required />
+                    </div>
+                    <div className="rfq-field">
+                      <label>Pincode <span>*</span></label>
+                      <input name="pincode" type="number" placeholder="Enter your pincode" value={rfqForm.pincode} onChange={handleChange} required />
+                    </div>
+                    <div className="rfq-field">
+                      <label>Address <span>*</span></label>
+                      <textarea name="address" placeholder="Enter your full address" value={rfqForm.address} onChange={handleChange} required rows={3} />
+                    </div>
+                    <div className="rfq-field">
+                      <label>Quantity Required <span>*</span></label>
+                      <div className="rfq-qty-row">
+                        <input name="quantity" type="number" step="any" min={minQty} placeholder={`Min. ${minQty}`} value={rfqForm.quantity} onChange={handleChange} required className="rfq-qty-input" />
+                        <div className="rfq-unit-group">
+                          <label className="rfq-unit-label">
+                            <input type="radio" name="unit" value={moqUnit} checked={rfqForm.unit === moqUnit || !rfqForm.unit} onChange={handleChange} required />
+                            {moqUnit}
+                          </label>
+                        </div>
+                      </div>
+                      {rfqError && <div style={{ color: '#d32f2f', fontSize: '13px', marginTop: '6px', fontWeight: '500' }}>{rfqError}</div>}
+                    </div>
+                    <button type="submit" className="rfq-submit-btn">Submit Inquiry <i className="fa-regular fa-paper-plane"></i></button>
+                  </form>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 };

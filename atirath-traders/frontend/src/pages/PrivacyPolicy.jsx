@@ -133,8 +133,8 @@ const PrivacyPolicy = () => {
               <div className="legal-contact-box">
                 <p><i className="fas fa-building"></i> <strong>Atirath Traders – Privacy Office</strong></p>
                 <p><i className="fas fa-map-marker-alt"></i> Hyderabad, Telangana, India</p>
-                <p><i className="fas fa-envelope"></i> privacy@atirathtraders.com</p>
-                <p><i className="fas fa-phone-alt"></i> +91 98765 43210</p>
+                <p><i className="fas fa-envelope"></i> info@atirathtraders.com</p>
+                <p><i className="fas fa-phone-alt"></i> +91 95537 74933</p>
               </div>
             </div>
           </div>

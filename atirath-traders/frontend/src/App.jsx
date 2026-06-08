@@ -21,11 +21,7 @@ import BlogPage from './pages/BlogPage';
 import BlogDetails from './pages/BlogDetails';
 import SignInPage from './pages/SignInPage';
 import SignUpPage from './pages/SignUpPage';
-import ImportServices from './pages/ImportServices';
-import ExportServices from './pages/ExportServices';
-import GlobalSourcing from './pages/GlobalSourcing';
-import LogisticsSupport from './pages/LogisticsSupport';
-import CustomSolutions from './pages/CustomSolutions';
+import ServicesPage from './pages/ServicesPage';
 import HelpCenter from './pages/HelpCenter';
 import TermsAndConditions from './pages/TermsAndConditions';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -65,11 +61,7 @@ function App() {
         <Route path="/blog/:id" element={<BlogDetails />} />
         <Route path="/signin" element={<SignInPage />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/services/import" element={<ImportServices />} />
-        <Route path="/services/export" element={<ExportServices />} />
-        <Route path="/services/global-sourcing" element={<GlobalSourcing />} />
-        <Route path="/services/logistics-support" element={<LogisticsSupport />} />
-        <Route path="/services/custom-solutions" element={<CustomSolutions />} />
+        <Route path="/services" element={<ServicesPage />} />
         <Route path="/support/help-center" element={<HelpCenter />} />
         <Route path="/support/terms" element={<TermsAndConditions />} />
         <Route path="/support/privacy-policy" element={<PrivacyPolicy />} />

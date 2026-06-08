@@ -43,11 +43,7 @@ const compressImage = (file) => {
 
 const Header = () => {
   const navigate = useNavigate();
-  const { categories, brands } = useProducts();
-  const [openDropdown, setOpenDropdown] = useState(null);
-  const productsRef = useRef(null);
-  const brandsRef = useRef(null);
-  const servicesRef = useRef(null);
+  const { categories } = useProducts();
   const profileRef = useRef(null);
 
   // Authentication State
@@ -140,7 +136,7 @@ const Header = () => {
     // 1. Listen to Firebase Authentication State Changes
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
-      
+
       // Clean up previous database listener if any
       if (unsubscribeDb) {
         unsubscribeDb();
@@ -165,17 +161,8 @@ const Header = () => {
       }
     });
 
-    // 2. Click Outside Listener for Dropdowns
+    // 2. Click Outside Listener for Profile Menu
     const handleClickOutside = (event) => {
-      // Close navigation dropdowns if clicked outside
-      if (
-        productsRef.current && !productsRef.current.contains(event.target) &&
-        brandsRef.current && !brandsRef.current.contains(event.target) &&
-        servicesRef.current && !servicesRef.current.contains(event.target)
-      ) {
-        setOpenDropdown(null);
-      }
-
       // Close profile dropdown if clicked outside
       if (profileRef.current && !profileRef.current.contains(event.target)) {
         setShowProfileMenu(false);
@@ -200,51 +187,60 @@ const Header = () => {
     }
   };
 
-  const handleItemClick = (path) => {
-    navigate(path);
-    setOpenDropdown(null);
+  // Search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
+
+  // Dynamically calculate select width based on the selected option's text
+  const getDropdownWidth = () => {
+    const text = selectedCategory ? selectedCategory : 'All Categories';
+    // Approximately 8.5px per character + 32px padding for arrow
+    return `${text.length * 8.5 + 32}px`;
   };
 
-  // Build products dropdown from dynamic categories
-  const categoriesDropdown = categories.map(cat => ({
-    name: cat,
-    path: `/products?category=${encodeURIComponent(cat)}`
-  }));
+  const handleSearch = () => {
+    const params = new URLSearchParams();
+    if (searchQuery.trim()) params.set('search', searchQuery.trim());
+    if (selectedCategory) params.set('category', selectedCategory);
+    navigate(`/products?${params.toString()}`);
+  };
 
-  // Brands dropdown from dynamic brands
-  const brandsDropdown = brands.map(brand => ({
-    name: brand,
-    path: `/brands?brand=${encodeURIComponent(brand)}`
-  }));
-
-  const servicesDropdown = [
-    { name: 'Import Services', path: '/services/import' },
-    { name: 'Export Services', path: '/services/export' },
-    { name: 'Global Sourcing', path: '/services/global-sourcing' },
-    { name: 'Logistics Support', path: '/services/logistics-support' },
-    { name: 'Custom Solutions', path: '/services/custom-solutions' },
-  ];
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'Enter') handleSearch();
+  };
 
   return (
     <div style={{ position: 'sticky', top: 0, zIndex: 1000, backgroundColor: 'transparent' }}>
       <div className="main-header">
         <div className="container header-content">
-          <div className="logo-area">
+          <div className="col-6 col-lg-auto order-1 text-start">
             <NavLink to="/">
               <img src="../Logo_4.png" alt="Atirath Traders Logo" className="header-logo" />
             </NavLink>
           </div>
 
-          <div className="search-wrapper">
-            <select>
-              <option>All Categories</option>
-              {categories.map(cat => <option key={cat}>{cat}</option>)}
-            </select>
-            <input type="text" placeholder="Search products, categories or suppliers..." />
-            <button>Search</button>
+          <div className="col-12 col-lg order-3 order-lg-2 d-flex justify-content-center">
+            <div className="search-wrapper">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                style={{ width: getDropdownWidth() }}
+              >
+                <option value="">All Categories</option>
+                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+              </select>
+              <input
+                type="text"
+                placeholder="Search products, categories or suppliers..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={handleSearchKeyDown}
+              />
+              <button onClick={handleSearch}>Search</button>
+            </div>
           </div>
 
-          <div className="header-icons">
+          <div className="col-6 col-lg-auto order-2 order-lg-3 d-flex justify-content-end align-items-center">
             {currentUser ? (
               <div className="header-profile-container" ref={profileRef}>
                 <div className="header-profile-trigger" onClick={() => setShowProfileMenu(!showProfileMenu)}>
@@ -274,12 +270,12 @@ const Header = () => {
                           <label htmlFor="profile-upload" className="btn-upload-photo">
                             <i className="fas fa-camera"></i> Change Photo
                           </label>
-                          <input 
-                            type="file" 
-                            id="profile-upload" 
-                            accept="image/*" 
-                            onChange={handleImageChange} 
-                            style={{ display: 'none' }} 
+                          <input
+                            type="file"
+                            id="profile-upload"
+                            accept="image/*"
+                            onChange={handleImageChange}
+                            style={{ display: 'none' }}
                             disabled={editLoading}
                           />
                         </div>
@@ -289,10 +285,10 @@ const Header = () => {
                           {editSuccess && <div className="edit-profile-success">{editSuccess}</div>}
                           <div className="profile-input-group">
                             <label>Name</label>
-                            <input 
-                              type="text" 
-                              value={editName} 
-                              onChange={(e) => setEditName(e.target.value)} 
+                            <input
+                              type="text"
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
                               className="profile-edit-input"
                               disabled={editLoading}
                               placeholder="enter full name"
@@ -300,10 +296,10 @@ const Header = () => {
                           </div>
                           <div className="profile-input-group">
                             <label>Phone</label>
-                            <input 
-                              type="tel" 
-                              value={editPhone} 
-                              onChange={(e) => setEditPhone(e.target.value)} 
+                            <input
+                              type="tel"
+                              value={editPhone}
+                              onChange={(e) => setEditPhone(e.target.value)}
                               className="profile-edit-input"
                               disabled={editLoading}
                               placeholder="enter phone number"
@@ -311,10 +307,10 @@ const Header = () => {
                           </div>
                           <div className="profile-input-group">
                             <label>Address</label>
-                            <input 
-                              type="text" 
-                              value={editAddress} 
-                              onChange={(e) => setEditAddress(e.target.value)} 
+                            <input
+                              type="text"
+                              value={editAddress}
+                              onChange={(e) => setEditAddress(e.target.value)}
                               className="profile-edit-input"
                               disabled={editLoading}
                               placeholder="enter address"
@@ -367,10 +363,6 @@ const Header = () => {
                 </NavLink>
               </div>
             )}
-            <div className="icon-cart">
-              <i className="fas fa-shopping-cart"></i>
-              <span className="cart-badge">0</span>
-            </div>
           </div>
         </div>
       </div>
@@ -380,53 +372,9 @@ const Header = () => {
           <ul className="nav-menu">
             <li><NavLink to="/" end>Home</NavLink></li>
 
-            {/* Products Dropdown */}
-            <li className="dropdown" ref={productsRef}>
-              <span className={`nav-link-custom ${openDropdown === 'products' ? 'active' : ''}`} onClick={() => toggleDropdown('products')}>
-                Products <i className="fas fa-chevron-down small-arrow"></i>
-              </span>
-              {openDropdown === 'products' && (
-                <ul className="dropdown-menu show">
-                  {categoriesDropdown.map((cat, idx) => (
-                    <li key={idx} onClick={() => handleItemClick(cat.path)}>
-                      <span>{cat.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-
-            {/* Brands Dropdown - added class "brands-dropdown" for scroll */}
-            <li className="dropdown" ref={brandsRef}>
-              <span className={`nav-link-custom ${openDropdown === 'brands' ? 'active' : ''}`} onClick={() => toggleDropdown('brands')}>
-                Brands <i className="fas fa-chevron-down small-arrow"></i>
-              </span>
-              {openDropdown === 'brands' && (
-                <ul className="dropdown-menu show brands-dropdown">
-                  {brandsDropdown.map((brand, idx) => (
-                    <li key={idx} onClick={() => handleItemClick(brand.path)}>
-                      <span>{brand.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
-
-            {/* Services Dropdown */}
-            <li className="dropdown" ref={servicesRef}>
-              <span className={`nav-link-custom ${openDropdown === 'services' ? 'active' : ''}`} onClick={() => toggleDropdown('services')}>
-                Services <i className="fas fa-chevron-down small-arrow"></i>
-              </span>
-              {openDropdown === 'services' && (
-                <ul className="dropdown-menu show">
-                  {servicesDropdown.map((service, idx) => (
-                    <li key={idx} onClick={() => handleItemClick(service.path)}>
-                      <span>{service.name}</span>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </li>
+            <li><NavLink to="/products">Products</NavLink></li>
+            <li><NavLink to="/brands">Brands</NavLink></li>
+            <li><NavLink to="/services">Services</NavLink></li>
 
             <li><NavLink to="/about">About Us</NavLink></li>
             <li><NavLink to="/blog">Blog</NavLink></li>

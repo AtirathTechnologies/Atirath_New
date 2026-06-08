@@ -23,14 +23,60 @@ const ProductListing = () => {
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeSubcategory, setActiveSubcategory] = useState(null);
   const [activeType, setActiveType] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Price Range, MOQ & Origin Filter states
+  const [maxPriceFilter, setMaxPriceFilter] = useState(100);
+  const [sliderMax, setSliderMax] = useState(100);
+  const [selectedOrigins, setSelectedOrigins] = useState([]);
+  const [moqInput, setMoqInput] = useState("");
+  const [appliedMoq, setAppliedMoq] = useState(null);
 
   // Sidebar expand states
   const [expandedCategories, setExpandedCategories] = useState({});
   const [expandedSubcategories, setExpandedSubcategories] = useState({});
 
-  // Sync from URL
+  // Helper to parse price string
+  const parseProductPrice = (priceStr) => {
+    if (!priceStr || priceStr.toLowerCase().includes("request")) return 0;
+    const firstPart = priceStr.split(/[–-]/)[0];
+    return parseFloat(firstPart.replace(/[^0-9.]/g, '')) || 0;
+  };
+
+  const getBaseFilteredProducts = () => {
+    let filtered = products;
+
+    // Category filter
+    if (activeCategory) {
+      filtered = filtered.filter(p => p.category === activeCategory);
+      if (activeSubcategory) {
+        filtered = filtered.filter(p => p.subcategory === activeSubcategory);
+      }
+      if (activeType) {
+        filtered = filtered.filter(p => p.subcategoryType === activeType);
+      }
+    }
+
+    // Search text filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      filtered = filtered.filter(p =>
+        (p.name || "").toLowerCase().includes(q) ||
+        (p.brand || "").toLowerCase().includes(q) ||
+        (p.subcategory || "").toLowerCase().includes(q) ||
+        (p.category || "").toLowerCase().includes(q) ||
+        (p.shortDesc || "").toLowerCase().includes(q) ||
+        (p.origin || "").toLowerCase().includes(q)
+      );
+    }
+    return filtered;
+  };
+
+  // Sync from URL and initialize price slider range
   useEffect(() => {
     const catParam = searchParams.get("category");
+    const searchParam = searchParams.get("search") || "";
+    setSearchQuery(searchParam);
     if (catParam) {
       setActiveCategory(catParam);
       setActiveSubcategory(null);
@@ -45,6 +91,22 @@ const ProductListing = () => {
       setExpandedSubcategories({});
     }
   }, [searchParams]);
+
+  // Calibrate price slider range based on loaded products and currency
+  useEffect(() => {
+    if (products && products.length) {
+      const baseProducts = getBaseFilteredProducts();
+      const prices = baseProducts.map(p => parseProductPrice(p.priceDisplay)).filter(p => p > 0);
+      if (prices.length) {
+        const maxVal = Math.ceil(Math.max(...prices));
+        setSliderMax(maxVal);
+        setMaxPriceFilter(maxVal);
+      } else {
+        setSliderMax(100);
+        setMaxPriceFilter(100);
+      }
+    }
+  }, [activeCategory, activeSubcategory, activeType, searchQuery, products]);
 
   const updateUrlCategory = (category) => {
     setSearchParams({ category });
@@ -62,6 +124,9 @@ const ProductListing = () => {
       setActiveCategory(categoryName);
       setActiveSubcategory(null);
       setActiveType(null);
+      setSelectedOrigins([]);
+      setMoqInput("");
+      setAppliedMoq(null);
       setExpandedCategories(prev => ({ ...prev, [categoryName]: true }));
       setExpandedSubcategories({});
       updateUrlCategory(categoryName);
@@ -72,6 +137,9 @@ const ProductListing = () => {
     setActiveCategory(categoryName);
     setActiveSubcategory(subcategoryName);
     setActiveType(null);
+    setSelectedOrigins([]);
+    setMoqInput("");
+    setAppliedMoq(null);
     // Expand this subcategory's types
     setExpandedSubcategories(prev => ({
       ...prev,
@@ -84,6 +152,9 @@ const ProductListing = () => {
     setActiveCategory(categoryName);
     setActiveSubcategory(subcategoryName);
     setActiveType(typeName);
+    setSelectedOrigins([]);
+    setMoqInput("");
+    setAppliedMoq(null);
     updateUrlCategory(categoryName);
   };
 
@@ -105,38 +176,78 @@ const ProductListing = () => {
     }));
   };
 
+  // Clear all filters
+  const handleClearAll = () => {
+    setActiveCategory(null);
+    setActiveSubcategory(null);
+    setActiveType(null);
+    setSearchQuery("");
+    setSelectedOrigins([]);
+    setMoqInput("");
+    setAppliedMoq(null);
+    setMaxPriceFilter(sliderMax);
+    setSearchParams({});
+  };
+
+  const handleApplyMoq = () => {
+    const val = parseFloat(moqInput);
+    if (!isNaN(val)) {
+      setAppliedMoq(val);
+    } else {
+      setAppliedMoq(null);
+    }
+  };
+
   // Filter products
   const getDisplayProducts = () => {
     if (loading) return { products: [], message: null, loading: true };
     if (error) return { products: [], message: error, loading: false };
     if (!products.length) return { products: [], message: "No products found.", loading: false };
 
-    if (!activeCategory) {
-      return { products: [], message: "👈 Select a category to browse products.", loading: false };
+    let filtered = getBaseFilteredProducts();
+
+    // Price range filter
+    filtered = filtered.filter(p => {
+      if (!p.priceDisplay || p.priceDisplay.toLowerCase().includes("request")) return true;
+      const priceVal = parseProductPrice(p.priceDisplay);
+      return priceVal <= maxPriceFilter;
+    });
+
+    // Country of Origin filter
+    if (selectedOrigins.length > 0) {
+      filtered = filtered.filter(p => selectedOrigins.includes(p.origin));
     }
 
-    let filtered = products.filter(p => p.category === activeCategory);
-    if (activeSubcategory) {
-      filtered = filtered.filter(p => p.subcategory === activeSubcategory);
-    }
-    if (activeType) {
-      filtered = filtered.filter(p => p.subcategoryType === activeType);
+    // MOQ filter
+    if (appliedMoq !== null) {
+      filtered = filtered.filter(p => {
+        if (!p.moq || String(p.moq).toLowerCase().includes("n/a")) return true;
+        const moqVal = parseFloat(String(p.moq).replace(/[^0-9.]/g, '')) || 0;
+        return moqVal <= appliedMoq;
+      });
     }
 
     if (filtered.length === 0) {
-      let msg = `No products found in ${activeCategory}`;
+      let msg = searchQuery.trim()
+        ? `No products found for "${searchQuery}"`
+        : `No products found`;
+      if (activeCategory) msg += ` in ${activeCategory}`;
       if (activeSubcategory) msg += ` / ${activeSubcategory}`;
       if (activeType) msg += ` / ${activeType}`;
       return { products: [], message: msg, loading: false };
     }
 
-    if (!activeSubcategory && !activeType) {
+    if (!activeCategory && !searchQuery.trim()) {
       filtered = shuffleArray(filtered);
     }
     return { products: filtered, message: null, loading: false };
   };
 
   const { products: displayProducts, message: displayMessage, loading: isLoading } = getDisplayProducts();
+
+  const baseProducts = getBaseFilteredProducts();
+  const hasRupee = baseProducts.some(p => p.priceDisplay && p.priceDisplay.includes("₹"));
+  const currencySymbol = hasRupee ? "₹" : "$";
 
   return (
     <div className="product-page">
@@ -152,7 +263,9 @@ const ProductListing = () => {
             <p className="breadcrumb">Home › Products</p>
             <h2>All Products</h2>
             <p className="subtitle">
-              {activeCategory 
+              {searchQuery.trim()
+                ? `Search results for "${searchQuery}"${activeCategory ? ` in ${activeCategory}` : ""}`
+                : activeCategory
                 ? `Showing ${activeCategory} products${activeSubcategory ? ` › ${activeSubcategory}` : ""}${activeType ? ` › ${activeType}` : ""}`
                 : "Discover our wide range of quality products from trusted global suppliers."}
             </p>
@@ -257,37 +370,65 @@ const ProductListing = () => {
               <p className="view-all">View All Categories</p>
             </div>
 
-            {/* Static filters */}
+            {/* Filters */}
             <div className="filter-header top">
               <h4>Filter By</h4>
-              <span className="clear">Clear All</span>
+              <span className="clear" onClick={handleClearAll}>Clear All</span>
             </div>
             <div className="filter-section">
               <p className="filter-title">Price Range</p>
-              <div className="range-values"><span>$10</span><span>$5000+</span></div>
-              <input type="range" className="range" />
+              <div className="range-values"><span>{currencySymbol}0</span><span>{currencySymbol}{maxPriceFilter}</span></div>
+              <input 
+                type="range" 
+                className="range" 
+                min="0" 
+                max={sliderMax} 
+                value={maxPriceFilter}
+                onChange={(e) => setMaxPriceFilter(Number(e.target.value))}
+              />
             </div>
             <div className="filter-section">
               <p className="filter-title">Minimum Order Quantity (MOQ)</p>
-              <div className="moq-box"><input type="text" placeholder="Enter MOQ" /><button>OK</button></div>
+              <div className="moq-box">
+                <input 
+                  type="text" 
+                  placeholder="Enter MOQ" 
+                  value={moqInput}
+                  onChange={(e) => setMoqInput(e.target.value)}
+                />
+                <button onClick={handleApplyMoq}>OK</button>
+              </div>
+              {appliedMoq !== null && (
+                <div style={{ fontSize: '12px', color: '#ff6b00', marginTop: '5px' }}>
+                  Applied Max MOQ: {appliedMoq}
+                </div>
+              )}
             </div>
             <div className="filter-section">
               <p className="filter-title">Country of Origin</p>
-              <label><input type="checkbox" /> India <span>(245)</span></label>
-              <label><input type="checkbox" /> China <span>(208)</span></label>
-              <label><input type="checkbox" /> USA <span>(128)</span></label>
-              <label><input type="checkbox" /> Germany <span>(95)</span></label>
-              <label><input type="checkbox" /> Turkey <span>(75)</span></label>
-              <p className="view-more">+ View More</p>
-            </div>
-            <div className="filter-section">
-              <p className="filter-title">Supplier Type</p>
-              <label><input type="checkbox" />Verified Suppliers</label>
-              <label><input type="checkbox" />Gold Suppliers 👑</label>
+              {[...new Set(baseProducts.map(p => p.origin).filter(Boolean))].slice(0, 5).map(origin => {
+                const count = baseProducts.filter(p => p.origin === origin).length;
+                return (
+                  <label key={origin}>
+                    <input 
+                      type="checkbox" 
+                      checked={selectedOrigins.includes(origin)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setSelectedOrigins([...selectedOrigins, origin]);
+                        } else {
+                          setSelectedOrigins(selectedOrigins.filter(o => o !== origin));
+                        }
+                      }}
+                    /> 
+                    {origin} <span>({count})</span>
+                  </label>
+                );
+              })}
             </div>
             <div className="filter-buttons">
-              <button className="apply">Apply Filters</button>
-              <button className="reset">Reset</button>
+              <button className="apply" onClick={() => {}}>Filters Active</button>
+              <button className="reset" onClick={handleClearAll}>Reset</button>
             </div>
           </div>
 
@@ -311,8 +452,9 @@ const ProductListing = () => {
                       <div className="product-price">{p.priceDisplay}</div>
                       <div className="product-meta">
                         <div className="meta-item"><span className="meta-icon">⚖️</span> quantity: {p.quantityDisplay}</div>
+                        <div className="meta-item"><span className="meta-icon">📦</span> MOQ: {p.moq}</div>
                         <div className="meta-item"><span className="meta-icon">📍</span> Origin: {p.origin}</div>
-                        <div className="meta-item"><span className="meta-icon">📦</span> Pack Type: {p.packTypes}</div>
+                        <div className="meta-item"><span className="meta-icon">🗂️</span> Pack Type: {p.packTypes}</div>
                       </div>
                       <div className="card-actions">
                         <button className="btn-view" onClick={() => {

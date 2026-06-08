@@ -95,17 +95,121 @@ const HomePage = () => {
     navigate(`/brands?brand=${encodeURIComponent(brandName)}`);
   };
 
-  // Map category names to Font Awesome icons
+  // Map category names to Font Awesome icons (covers all Firebase category name variants)
   const getCategoryIcon = (cat) => {
-    const icons = {
-      Agriculture: "fas fa-seedling",
+    const exactIcons = {
+      // Agriculture variants
+      "Agriculture": "fas fa-seedling",
+      "Agri Products": "fas fa-seedling",
+      "Agricultural Products": "fas fa-seedling",
+      "Agri": "fas fa-seedling",
+
+      // Food & Beverage variants
       "Food & Beverages": "fas fa-utensils",
-      Textiles: "fas fa-tshirt",
-      Electronics: "fas fa-microchip",
+      "Food and Beverages": "fas fa-utensils",
+      "Food": "fas fa-utensils",
+      "Beverages": "fas fa-coffee",
+      "Food & Drinks": "fas fa-utensils",
+
+      // Condiments / Spices
+      "Condiments": "fas fa-mortar-pestle",
+      "Spices": "fas fa-mortar-pestle",
+      "Spices & Condiments": "fas fa-mortar-pestle",
+      "Herbs & Spices": "fas fa-mortar-pestle",
+      "Sauces": "fas fa-mortar-pestle",
+
+      // Rice / Grains
+      "Rice": "fas fa-leaf",
+      "Basmati Rice": "fas fa-leaf",
+      "Grains": "fas fa-seedling",
+      "Cereals": "fas fa-seedling",
+      "Pulses": "fas fa-seedling",
+
+      // Textiles
+      "Textiles": "fas fa-tshirt",
+      "Textile": "fas fa-tshirt",
+      "Fabrics": "fas fa-tshirt",
+      "Textiles & Fabrics": "fas fa-tshirt",
+      "Garments": "fas fa-tshirt",
+      "Clothing": "fas fa-tshirt",
+
+      // Electronics
+      "Electronics": "fas fa-microchip",
+      "Electronics & Accessories": "fas fa-microchip",
+      "Electrical": "fas fa-bolt",
+      "Gadgets": "fas fa-mobile-alt",
+
+      // Home & Lifestyle
       "Home & Lifestyle": "fas fa-couch",
+      "Home & Lifestyle Products": "fas fa-couch",
+      "Home": "fas fa-home",
+      "Furniture": "fas fa-couch",
+      "Home Decor": "fas fa-couch",
+
+      // Auto Parts
       "Auto Parts": "fas fa-car",
+      "Automotive": "fas fa-car",
+      "Spare Parts": "fas fa-cogs",
+
+      // Machinery
+      "Machinery": "fas fa-cogs",
+      "Machinery & Equipment": "fas fa-cogs",
+      "Equipment": "fas fa-tools",
+      "Industrial": "fas fa-industry",
+
+      // Chemicals & Minerals
+      "Chemicals": "fas fa-flask",
+      "Chemicals & Minerals": "fas fa-flask",
+      "Minerals": "fas fa-gem",
+
+      // Health & Beauty
+      "Health & Beauty": "fas fa-heartbeat",
+      "Healthcare": "fas fa-heartbeat",
+      "Pharma": "fas fa-pills",
+      "Cosmetics": "fas fa-spa",
+
+      // Construction
+      "Construction": "fas fa-hard-hat",
+      "Building Materials": "fas fa-hard-hat",
+
+      // Dry Fruits / Nuts
+      "Dry Fruits": "fas fa-leaf",
+      "Nuts & Dry Fruits": "fas fa-leaf",
+
+      // Seafood / Meat
+      "Seafood": "fas fa-fish",
+      "Meat": "fas fa-drumstick-bite",
+      "Poultry": "fas fa-drumstick-bite",
+
+      // Fruits & Vegetables
+      "Fruits & Vegetables": "fas fa-apple-alt",
+      "Fruits": "fas fa-apple-alt",
+      "Vegetables": "fas fa-carrot",
+      "Fresh Produce": "fas fa-carrot",
     };
-    return icons[cat] || "fas fa-tag";
+
+    // Exact match first
+    if (exactIcons[cat]) return exactIcons[cat];
+
+    // Fuzzy / keyword match fallback
+    const lower = cat.toLowerCase();
+    if (lower.includes("agri") || lower.includes("crop") || lower.includes("farm")) return "fas fa-seedling";
+    if (lower.includes("rice") || lower.includes("grain") || lower.includes("cereal")) return "fas fa-leaf";
+    if (lower.includes("spice") || lower.includes("condiment") || lower.includes("herb")) return "fas fa-mortar-pestle";
+    if (lower.includes("food") || lower.includes("beverage") || lower.includes("drink")) return "fas fa-utensils";
+    if (lower.includes("fruit") || lower.includes("vegetable") || lower.includes("produce")) return "fas fa-apple-alt";
+    if (lower.includes("textile") || lower.includes("fabric") || lower.includes("garment") || lower.includes("cloth")) return "fas fa-tshirt";
+    if (lower.includes("electronic") || lower.includes("gadget") || lower.includes("tech")) return "fas fa-microchip";
+    if (lower.includes("home") || lower.includes("furniture") || lower.includes("decor")) return "fas fa-couch";
+    if (lower.includes("auto") || lower.includes("car") || lower.includes("vehicle")) return "fas fa-car";
+    if (lower.includes("machine") || lower.includes("equipment") || lower.includes("industrial")) return "fas fa-cogs";
+    if (lower.includes("chemical") || lower.includes("mineral") || lower.includes("lab")) return "fas fa-flask";
+    if (lower.includes("health") || lower.includes("pharma") || lower.includes("medical")) return "fas fa-heartbeat";
+    if (lower.includes("seafood") || lower.includes("fish")) return "fas fa-fish";
+    if (lower.includes("dry fruit") || lower.includes("nut")) return "fas fa-leaf";
+    if (lower.includes("construct") || lower.includes("build")) return "fas fa-hard-hat";
+
+    return "fas fa-box-open";
   };
 
   if (loading) {

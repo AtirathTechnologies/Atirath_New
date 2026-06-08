@@ -130,11 +130,12 @@ const AboutPage = () => {
           </div>
           <div className="global-grid">
             <div className="global-map">
-              <iframe 
-                src="https://www.google.com/maps?q=Hyderabad,India&output=embed" 
-                allowFullScreen 
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.2216480407724!2d78.38583247383066!3d17.44910230102695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb91000098943d%3A0xcc4507c0561825ba!2sAtirath%20Traders!5e0!3m2!1sen!2sin!4v1780726727666!5m2!1sen!2sin"
+                allowFullScreen
                 loading="lazy"
-                title="Global office map"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Atirath Traders Office Location"
               ></iframe>
             </div>
             <div className="global-stats">

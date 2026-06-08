@@ -35,8 +35,8 @@ const ContactPage = () => {
             <div className="info-item"><div className="info-icon whatsapp"><i className="fa-brands fa-whatsapp"></i></div><div><h4>WhatsApp</h4><p><strong>+91 95537 74933</strong></p><small>Chat with us on WhatsApp</small></div></div>
             <div className="info-item"><div className="info-icon email"><i className="fa-regular fa-envelope"></i></div><div><h4>Email</h4><p><strong>info@atirathtraders.com</strong></p><small>Drop us an email anytime</small></div></div>
             <div className="info-item"><div className="info-icon phone"><i className="fa-solid fa-phone"></i></div><div><h4>Phone</h4><p><strong>+91 95537 74933</strong></p><small>Mon - Sat: 9:00 AM - 6:00 PM</small></div></div>
-            <div className="info-item"><div className="info-icon location"><i className="fa-solid fa-location-dot"></i></div><div><h4>Office Address</h4><p><strong>Atirath Traders Pvt. Ltd.</strong><br />123, Business Park, HITEC City,<br />Hyderabad, Telangana - 500081, India</p></div></div>
-            <div className="social"><h4>Follow Us</h4><div className="social-icons"><a href="#"><i className="fab fa-facebook-f"></i></a><a href="#"><i className="fab fa-linkedin-in"></i></a><a href="#"><i className="fab fa-instagram"></i></a><a href="#"><i className="fab fa-whatsapp"></i></a></div></div>
+            <div className="info-item"><div className="info-icon location"><i className="fa-solid fa-location-dot"></i></div><div><h4>Office Address</h4><p><strong>Atirath Traders Pvt. Ltd.</strong><br />Plot No:45, Jai Hind Enclave, Silicon valley, VIP Hills,<br />Madhapur Hyderabad, Telangana - 500081, India</p></div></div>
+            <div className="social"><h4>Follow Us</h4><div className="social-icons"><a href="https://www.facebook.com/share/1GE7seKPgf/"><i className="fab fa-facebook-f"></i></a><a href="https://www.linkedin.com/company/atirath-traders-india-private/"><i className="fab fa-linkedin-in"></i></a><a href="https://www.instagram.com/atirathtradersindia?igsh=c2JvbjB3YzJsMjZu"><i className="fab fa-instagram"></i></a><a href="https://wa.me/919553774933"><i className="fab fa-whatsapp"></i></a></div></div>
           </div>
         </div>
       </section>
@@ -46,11 +46,20 @@ const ContactPage = () => {
           <div className="map-wrapper">
             <div className="map-info-card">
               <h3>We Are Here</h3>
-              <h4>Atirath Traders Pvt. Ltd.</h4>
-              <p>123, Business Park, HITEC City,<br />Hyderabad, Telangana - 500081, India</p>
-              <a href="#"><i className="fa-solid fa-location-dot"></i> View on Google Maps</a>
+              <h4>Atirath Traders</h4>
+              <p>Plot No:45, Jai Hind Enclave, Silicon Valley,<br />VIP Hills, Madhapur,<br />Hyderabad, Telangana - 500081, India</p>
+              <a href="https://maps.app.goo.gl/AtirathTradersLocation" target="_blank" rel="noopener noreferrer"><i className="fa-solid fa-location-dot"></i> View on Google Maps</a>
             </div>
-            <iframe src="https://www.google.com/maps?q=HITEC+City,Hyderabad&output=embed" width="100%" height="420" style={{ border: 0 }} allowFullScreen loading="lazy"></iframe>
+            <iframe
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.2216480407724!2d78.38583247383066!3d17.44910230102695!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb91000098943d%3A0xcc4507c0561825ba!2sAtirath%20Traders!5e0!3m2!1sen!2sin!4v1780726727666!5m2!1sen!2sin"
+              width="100%"
+              height="420"
+              style={{ border: 0 }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              title="Atirath Traders Location"
+            ></iframe>
           </div>
         </div>
       </section>
