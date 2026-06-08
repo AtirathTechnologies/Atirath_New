@@ -68,9 +68,7 @@ const ContactPage = () => {
         <div className="container">
           <h2 className="office-title">Our Office Locations</h2>
           <div className="office-grid">
-            <div className="office-card"><img src="/india-office.jpg" alt="India Office" /><div className="office-content"><h3><i className="fa-solid fa-location-dot"></i> Head Office - India</h3><p>123, Business Park, HITEC City,<br />Hyderabad, Telangana - 500081, India</p><p><i className="fa-solid fa-phone"></i> +91 98765 43210</p><p><i className="fa-solid fa-envelope"></i> info@atirathtraders.com</p></div></div>
-            <div className="office-card"><img src="/uae-office.jpg" alt="UAE Office" /><div className="office-content"><h3><i className="fa-solid fa-location-dot"></i> Branch Office - UAE</h3><p>502, Business Center, Sharjah,<br />United Arab Emirates</p><p><i className="fa-solid fa-phone"></i> +971 50 123 4567</p><p><i className="fa-solid fa-envelope"></i> uae@atirathtraders.com</p></div></div>
-            <div className="office-card"><img src="/usa-office.jpg" alt="USA Office" /><div className="office-content"><h3><i className="fa-solid fa-location-dot"></i> Branch Office - USA</h3><p>8 The Green, Suite A, Dover,<br />Delaware - 19901, USA</p><p><i className="fa-solid fa-phone"></i> +1 (302) 123 4567</p><p><i className="fa-solid fa-envelope"></i> usa@atirathtraders.com</p></div></div>
+            <div className="office-card"><img src="/india-office.png" alt="India Office" /><div className="office-content"><h3><i className="fa-solid fa-location-dot"></i> Head Office - India</h3><p>Plot No:45, Jai Hind Enclave, Silicon Valley,<br/>VIP Hills, Madhapur,<br />Hyderabad, Telangana - 500081, India</p><p><i className="fa-solid fa-phone"></i> +91 95537 74933</p><p><i className="fa-solid fa-envelope"></i> info@atirathtraders.com</p></div></div>
           </div>
         </div>
       </section>
